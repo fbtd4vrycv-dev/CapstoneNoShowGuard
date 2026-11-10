@@ -27,11 +27,15 @@ def main():
 
     # (a) Ages outside the valid range are treated as missing.
     invalid_age = (df["age"] < 1) | (df["age"] > 100)
+    invalid_age_count = invalid_age.sum()
     df.loc[invalid_age, "age"] = np.nan
+    print("Invalid ages set to missing:", invalid_age_count)
 
     # (b) Fill gaps before calculating quartiles and fences.
     age_median = df["age"].median()
     distance_median = df["distance_km"].median()
+    print("Median age:", age_median)
+    print("Median distance_km:", distance_median)
     df["age"] = df["age"].fillna(age_median).round().astype(int)
     df["distance_km"] = df["distance_km"].fillna(distance_median)
 
@@ -44,12 +48,14 @@ def main():
         upper_fence = q3 + 1.5 * iqr
 
         capped_count = ((df[column] < lower_fence) | (df[column] > upper_fence)).sum()
+        print(f"{column}: Q1={q1}, Q3={q3}, lower fence={lower_fence}, upper fence={upper_fence}")
         df[column] = np.clip(df[column], lower_fence, upper_fence)
         print(f"{column}: capped {capped_count} value(s)")
 
     # (d) Apply the requested final precision.
     df["distance_km"] = df["distance_km"].round(1)
     df["fee_inr"] = df["fee_inr"].round().astype(int)
+    print("Largest fee_inr after capping and rounding:", df["fee_inr"].max())
 
     print("\nFinal shape:", df.shape)
     print("Missing values in age, distance_km, fee_inr:")

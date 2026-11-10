@@ -41,6 +41,9 @@ def main():
     # Create the requested features.
     df["lead_days"] = (df["appt_date"] - df["booked_on"]).dt.days
     df["no_show"] = (df["status"] == "No-Show").astype(int)
+    print("lead_days range:", df["lead_days"].min(), "to", df["lead_days"].max())
+    print("No-shows:", df["no_show"].sum(), "of", len(df))
+    print("No-show share:", df["no_show"].mean())
 
     # Build a NumPy array and compute the requested summaries without loops.
     X = df[["age", "distance_km", "fee_inr", "lead_days"]].to_numpy()
